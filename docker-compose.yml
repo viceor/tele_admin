@@ -1,0 +1,13 @@
+services:
+  teleadmin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - teleadmin-data:/app/data
+
+volumes:
+  teleadmin-data:

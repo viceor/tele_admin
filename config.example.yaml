@@ -1,0 +1,83 @@
+# tele-admin configuration sample.
+# Copy to config.yaml and replace the placeholder token with a real bot token
+# from @BotFather.
+
+token: "123456:REPLACE_WITH_YOUR_BOT_TOKEN"
+
+# Optional: point at a mock Telegram API server (used in tests).
+# api_server_url: "http://localhost:8080"
+
+# polling | webhook
+mode: polling
+
+# Webhook mode requires:
+#   - a non-empty secret_token (sent to Telegram setWebhook and checked against
+#     the X-Telegram-Bot-Api-Secret-Token header of every inbound update);
+#   - an HTTPS public_url used at startup to register the webhook with Telegram;
+#   - a loopback, private, or link-local listen address (never 0.0.0.0, a public
+#     IP, or a hostname), because this server speaks plaintext HTTP and must sit
+#     behind a TLS-terminating reverse proxy.
+webhook:
+  listen: "127.0.0.1:8443"
+  path: "/webhook"
+  public_url: "https://example.com"
+  secret_token: ""
+
+# Log level: debug | info | warn | error (default info). Applied at startup.
+log_level: info
+
+# Persistence. When path is set, chat settings (language, timezone, welcome
+# state), AI cards, the publish target registry and publish records, and the
+# profiles/templates tables behind /clone are stored in this file and survive
+# a restart; the parent directory is created automatically. Transient state —
+# the anti-spam rate windows and in-flight welcome placeholders — is
+# deliberately not persisted. When the path is empty or the section is
+# removed, the service runs in memory only and logs that state is lost on
+# restart.
+db:
+  path: "data/teleadmin.db"
+
+i18n:
+  default_language: en
+  supported:
+    - en
+    - zh
+
+timezone:
+  default: UTC
+
+# Admin authorization:
+#   - enforce_admin MUST be true in production. Setting it to false is
+#     rejected at startup unless explicit local development mode is enabled
+#     (TELEADMIN_DEV_MODE=1), and it then logs a prominent security warning.
+#   - owner_ids lists bot owners. While enforcement is on, owners are always
+#     authorized for admin commands, even in chats where they are not a
+#     creator/administrator; every other user must pass the chat admin check.
+admin:
+  enforce_admin: true
+  owner_ids: []
+
+spam:
+  max_messages_per_minute: 20
+  min_message_interval_ms: 1000
+
+welcome:
+  enabled: true
+  message: ""
+
+keywords:
+  blocked: []
+
+# /publish (text/media multi-target publishing) limits. Values <= 0 fall back
+# to the defaults shown here.
+publish:
+  # Maximum number of target chats per /publish command.
+  max_targets: 10
+  # Maximum content length in characters: text length, and media captions
+  # (additionally capped to Telegram's 1024-character caption limit).
+  max_content_length: 4096
+  # Per-target deadline for the permission probe and send of one /publish
+  # target; a target that exceeds it is recorded as a timeout failure.
+  per_target_timeout: 10s
+  # Maximum number of /publish targets receiving content in parallel.
+  max_concurrent_sends: 4
